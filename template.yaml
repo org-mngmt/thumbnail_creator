@@ -28,14 +28,14 @@ Parameters:
   ThumbnailWidth:
     Type: Number
     Default: 150
+  UploadBucket:
+    Type: String
+    Description: Arn of the UploadBucket
+  ResultsBucket:
+    Type: String
+    Description: Arn of the ResultsBucket
 
 Resources:
-  UploadBucket:
-    Type: AWS::S3::Bucket
-
-  ResultsBucket:
-    Type: AWS::S3::Bucket
-
   CreateThumbnail:
     Type: AWS::Serverless::Function
     Properties:
@@ -49,8 +49,10 @@ Resources:
         - !Ref FfmpegLayer
         - !Ref FileTypeUtils
       Policies:
-      - S3CrudPolicy:
-          BucketName: !Sub "${AWS::StackName}-*"
+        - S3ReadPolicy:
+            BucketName: !Ref UploadBucket
+        - S3WritePolicy:
+            BucketName: !Ref ResultsBucket
       Environment:
         Variables:
           OUTPUT_BUCKET: !Ref ResultsBucket
